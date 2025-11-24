@@ -1,0 +1,9 @@
+# Permissions nécessaires pour l'utilisation de Trivy Operator via AgroCD
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: trivy-operator
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "namespaces"]
+    verbs: ["get", "list", "watch"]
