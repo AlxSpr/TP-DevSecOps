@@ -2,13 +2,13 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: trivy-operator
-  namespace: trivy-system
+  namespace: argocd
 spec:
   project: default
   source:
-    repoURL: https://github.com/aquasecurity/trivy-operator.git
-    targetRevision: main
-    path: deploy/helm
+    repoURL: https://aquasecurity.github.io/helm-charts/
+    chart: trivy-operator
+    targetRevision: latest
     helm:
       releaseName: trivy-operator
       values: |
@@ -16,7 +16,6 @@ spec:
           create: true
           name: trivy-operator
         image:
-          repository: aquasec/trivy-operator
           tag: latest
   destination:
     server: https://kubernetes.default.svc
