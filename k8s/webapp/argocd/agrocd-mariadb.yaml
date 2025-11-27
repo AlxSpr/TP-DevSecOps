@@ -11,7 +11,7 @@ spec:
     server: https://kubernetes.default.svc
 
   source:
-    repoURL: 'https://github.com/<votre_repo>'
+    repoURL: 'https://github.com/AlxSpr/TP-DevSecOps.git'
     targetRevision: main
     path: webapp
 
