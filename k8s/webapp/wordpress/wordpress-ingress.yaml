@@ -16,7 +16,3 @@ spec:
                 name: wordpress
                 port:
                   number: 80
-  tls:
-    - hosts:
-        - wordpress.local       # <-- idem domaine
-      secretName: wordpress-tls # secret TLS (cert-manager ou manuel)
