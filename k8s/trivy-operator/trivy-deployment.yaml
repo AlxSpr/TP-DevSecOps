@@ -16,7 +16,7 @@ spec:
       serviceAccountName: trivy-operator
       containers:
         - name: trivy-operator
-          image: aquasec/trivy-operator:latest
+          image: aquasec/trivy-operator:0.29.0
           args:
             - "--scan-vuln"
             - "--scan-config"
