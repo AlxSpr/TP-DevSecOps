@@ -6,7 +6,7 @@ metadata:
 spec:
   ports:
     - port: 3306
-      targetPort: 3306
+      name: mysql
+  clusterIP: None
   selector:
     app: mariadb
-  type: ClusterIP
