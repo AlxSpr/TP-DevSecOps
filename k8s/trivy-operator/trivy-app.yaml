@@ -1,18 +1,23 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: trivy-app
+  name: trivy-operator
   namespace: trivy-system
 spec:
   project: default
   source:
-    repoURL: https://aquasecurity.github.io/helm-charts/
-    chart: trivy-app
-    targetRevision: latest
+    repoURL: https://github.com/aquasecurity/trivy-operator.git
+    targetRevision: main
+    path: deploy/helm
     helm:
+      releaseName: trivy-operator
       values: |
-        trivy:
-          ignoreUnfixed: true
+        serviceAccount:
+          create: true
+          name: trivy-operator
+        image:
+          repository: aquasec/trivy-operator
+          tag: latest
   destination:
     server: https://kubernetes.default.svc
     namespace: trivy-system
