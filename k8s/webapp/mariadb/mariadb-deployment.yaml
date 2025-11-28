@@ -35,7 +35,7 @@ spec:
             - name: XTRABACKUP_PASSWORD
               value: xtrabackuppass
             - name: CLUSTER_ADDRESS
-              value: "gcomm://mariadb-0.mariadb-service.mariadb.svc.cluster.local,mariadb-1.mariadb-service.mariadb.svc.cluster.local,mariadb-2.mariadb-service.mariadb.svc.cluster.local"
+              value: "gcomm://mariadb-0.mariadb-service,mariadb-1.mariadb-service,mariadb-2.mariadb-service"
           volumeMounts:
             - name: mariadb-pvc
               mountPath: /var/lib/mysql
