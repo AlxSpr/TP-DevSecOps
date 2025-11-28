@@ -37,7 +37,7 @@ spec:
             - name: CLUSTER_ADDRESS
               value: "gcomm://mariadb-0.mariadb.database.svc.cluster.local,mariadb-1.mariadb.database.svc.cluster.local,mariadb-2.mariadb.database.svc.cluster.local"
           volumeMounts:
-            - name: mariadb-data
+            - name: mariadb-pvc
               mountPath: /var/lib/mysql
   volumeClaimTemplates:
     - metadata:
