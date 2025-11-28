@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: phpmyadmin
+  namespace: mariadb
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: phpmyadmin
+  template:
+    metadata:
+      labels:
+        app: phpmyadmin
+    spec:
+      containers:
+        - name: phpmyadmin
+          image: phpmyadmin/phpmyadmin:latest
+          env:
+            - name: PMA_HOST
+              value: "mariadb-0.mariadb.database.svc.cluster.local" # ou mariadb-0 si DNS interne
+            - name: PMA_PORT
+              value: "3306"
+            - name: PMA_USER
+              value: "root"
+            - name: PMA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-secret
+                  key: mariadb-root-password
+          ports:
+            - containerPort: 80
