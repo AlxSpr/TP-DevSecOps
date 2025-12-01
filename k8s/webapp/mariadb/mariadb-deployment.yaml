@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: mariadb
-        image: bitnami/mariadb-galera:latest
+        image: bitnami/mariadb-galera:10.5.27
         env:
         - name: MARIADB_ROOT_PASSWORD
           valueFrom:
