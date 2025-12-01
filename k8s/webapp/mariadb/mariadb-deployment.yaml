@@ -32,11 +32,21 @@ spec:
             secretKeyRef:
               name: mariadb-secret
               key: galera-sst-password
+        # Détecte automatiquement si c'est le premier pod
         - name: GALERA_CLUSTER_ADDRESS
-          value: |
-            gcomm://$(FIRST_POD)
-        - name: FIRST_POD
-          value: mariadb-0.mariadb-headless.mariadb.svc.cluster.local
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        command:
+        - /bin/sh
+        - -c
+        - |
+          if [ "$(hostname)" = "mariadb-0" ]; then
+            export GALERA_CLUSTER_ADDRESS="gcomm://"
+          else
+            export GALERA_CLUSTER_ADDRESS="gcomm://mariadb-0.mariadb-headless.mariadb.svc.cluster.local"
+          fi
+          exec docker-entrypoint.sh mysqld
         ports:
         - name: mysql
           containerPort: 3306
