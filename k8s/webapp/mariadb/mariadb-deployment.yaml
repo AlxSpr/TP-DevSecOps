@@ -4,8 +4,8 @@ metadata:
   name: mariadb
   namespace: mariadb
 spec:
-  serviceName: "mariadb"
-  replicas: 3  # 3 pods pour le quorum
+  serviceName: mariadb-headless
+  replicas: 3
   selector:
     matchLabels:
       app: mariadb
@@ -15,36 +15,47 @@ spec:
         app: mariadb
     spec:
       containers:
-        - name: mariadb
-          image: mariadb:latest
-          ports:
-            - containerPort: 3306
-              name: mysql
-          env:
-            - name: MYSQL_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mariadb-secret
-                  key: mariadb-root-password
-            - name: MYSQL_REPLICATION_USER
-              value: repl
-            - name: MYSQL_REPLICATION_PASSWORD
-              value: replpass
-            - name: CLUSTER_NAME
-              value: mariadb-cluster
-            - name: XTRABACKUP_PASSWORD
-              value: xtrabackuppass
-            - name: CLUSTER_ADDRESS
-              value: "gcomm://mariadb-0.mariadb-service,mariadb-1.mariadb-service,mariadb-2.mariadb-service"
-          volumeMounts:
-            - name: mariadb-pvc
-              mountPath: /var/lib/mysql
+      - name: mariadb
+        image: bitnami/mariadb-galera:latest
+        env:
+        - name: MARIADB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mariadb-secret
+              key: mariadb-root-password
+
+        # Nom du cluster
+        - name: MARIADB_GALERA_CLUSTER_NAME
+          value: "mariadb-galera"
+
+        # Adresse du cluster
+        - name: MARIADB_GALERA_CLUSTER_ADDRESS
+          value: "gcomm://mariadb-0.mariadb-headless.mariadb.svc.cluster.local,mariadb-1.mariadb-headless.mariadb.svc.cluster.local,mariadb-2.mariadb-headless.mariadb.svc.cluster.local"
+
+        # User interne pour SST
+        - name: MARIADB_GALERA_MARIABACKUP_PASSWORD
+          value: "backup123"
+
+        ports:
+        - name: mysql
+          containerPort: 3306
+        - name: galera
+          containerPort: 4567
+        - name: ist
+          containerPort: 4568
+        - name: sst
+          containerPort: 4444
+
+        volumeMounts:
+        - name: datadir
+          mountPath: /bitnami/mariadb
+
   volumeClaimTemplates:
-    - metadata:
-        name: mariadb-pvc
-      spec:
-        accessModes: [ "ReadWriteOnce" ]
-        resources:
-          requests:
-            storage: 10Gi
-        storageClassName: standard
+  - metadata:
+      name: datadir
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: standard
