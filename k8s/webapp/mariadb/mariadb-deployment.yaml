@@ -16,26 +16,24 @@ spec:
     spec:
       containers:
       - name: mariadb
-        image: bitnami/mariadb-galera:10.5.27
+        image: wodby/mariadb:galera
         env:
-        - name: MARIADB_ROOT_PASSWORD
+        - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
               name: mariadb-secret
               key: mariadb-root-password
-
-        # Nom du cluster
-        - name: MARIADB_GALERA_CLUSTER_NAME
+        - name: WSREP_ON
+          value: "ON"
+        - name: GALERA_CLUSTER_NAME
           value: "mariadb-galera"
-
-        # Adresse du cluster
-        - name: MARIADB_GALERA_CLUSTER_ADDRESS
+        - name: GALERA_CLUSTER_ADDRESS
           value: "gcomm://mariadb-0.mariadb-headless.mariadb.svc.cluster.local,mariadb-1.mariadb-headless.mariadb.svc.cluster.local,mariadb-2.mariadb-headless.mariadb.svc.cluster.local"
-
-        # User interne pour SST
-        - name: MARIADB_GALERA_MARIABACKUP_PASSWORD
-          value: "backup123"
-
+        - name: GALERA_SST_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mariadb-secret
+              key: galera-sst-password
         ports:
         - name: mysql
           containerPort: 3306
@@ -45,11 +43,9 @@ spec:
           containerPort: 4568
         - name: sst
           containerPort: 4444
-
         volumeMounts:
         - name: datadir
-          mountPath: /bitnami/mariadb
-
+          mountPath: /var/lib/mysql
   volumeClaimTemplates:
   - metadata:
       name: datadir
