@@ -4,9 +4,9 @@ metadata:
   name: mariadb-service
   namespace: mariadb
 spec:
-  ports:
-    - port: 3306
-      name: mysql
-  clusterIP: None
+  type: ClusterIP
   selector:
     app: mariadb
+  ports:
+    - name: mysql
+      port: 3306
