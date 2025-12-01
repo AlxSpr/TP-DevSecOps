@@ -4,11 +4,11 @@ metadata:
   name: phpmyadmin-ingress
   namespace: mariadb
   annotations:
-    kubernetes.io/ingress.class: nginx       # ou traefik selon ton cluster
+    kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-    - host: phpmyadmin.local         # change par ton domaine
+    - host: phpmyadmin.local
       http:
         paths:
           - path: /
