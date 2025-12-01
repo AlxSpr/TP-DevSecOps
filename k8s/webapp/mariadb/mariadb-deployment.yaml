@@ -4,8 +4,8 @@ metadata:
   name: mariadb
   namespace: mariadb
 spec:
-  serviceName: mariadb-headless
-  replicas: 3
+  serviceName: "mariadb"
+  replicas: 3  # 3 pods pour le quorum
   selector:
     matchLabels:
       app: mariadb
@@ -15,56 +15,36 @@ spec:
         app: mariadb
     spec:
       containers:
-      - name: mariadb
-        image: wodby/mariadb:galera
-        env:
-        - name: MYSQL_ROOT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mariadb-secret
-              key: mariadb-root-password
-        - name: WSREP_ON
-          value: "ON"
-        - name: GALERA_CLUSTER_NAME
-          value: "mariadb-galera"
-        - name: GALERA_SST_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mariadb-secret
-              key: galera-sst-password
-        # Détecte automatiquement si c'est le premier pod
-        - name: GALERA_CLUSTER_ADDRESS
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        command:
-        - /bin/sh
-        - -c
-        - |
-          if [ "$(hostname)" = "mariadb-0" ]; then
-            export GALERA_CLUSTER_ADDRESS="gcomm://"
-          else
-            export GALERA_CLUSTER_ADDRESS="gcomm://mariadb-0.mariadb-headless.mariadb.svc.cluster.local"
-          fi
-          exec docker-entrypoint.sh mysqld
-        ports:
-        - name: mysql
-          containerPort: 3306
-        - name: galera
-          containerPort: 4567
-        - name: ist
-          containerPort: 4568
-        - name: sst
-          containerPort: 4444
-        volumeMounts:
-        - name: datadir
-          mountPath: /var/lib/mysql
+        - name: mariadb
+          image: mariadb:latest
+          ports:
+            - containerPort: 3306
+              name: mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-secret
+                  key: mariadb-root-password
+            - name: MYSQL_REPLICATION_USER
+              value: repl
+            - name: MYSQL_REPLICATION_PASSWORD
+              value: replpass
+            - name: CLUSTER_NAME
+              value: mariadb-cluster
+            - name: XTRABACKUP_PASSWORD
+              value: xtrabackuppass
+            - name: CLUSTER_ADDRESS
+              value: "gcomm://mariadb-0.mariadb-service,mariadb-1.mariadb-service,mariadb-2.mariadb-service"
+          volumeMounts:
+            - name: mariadb-pvc
+              mountPath: /var/lib/mysql
   volumeClaimTemplates:
-  - metadata:
-      name: datadir
-    spec:
-      accessModes: ["ReadWriteOnce"]
-      resources:
-        requests:
-          storage: 10Gi
-      storageClassName: standard
+    - metadata:
+        name: mariadb-pvc
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 10Gi
+        storageClassName: standard
