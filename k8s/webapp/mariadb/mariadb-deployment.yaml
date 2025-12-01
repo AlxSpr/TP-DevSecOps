@@ -27,13 +27,16 @@ spec:
           value: "ON"
         - name: GALERA_CLUSTER_NAME
           value: "mariadb-galera"
-        - name: GALERA_CLUSTER_ADDRESS
-          value: "gcomm://mariadb-0.mariadb-headless.mariadb.svc.cluster.local,mariadb-1.mariadb-headless.mariadb.svc.cluster.local,mariadb-2.mariadb-headless.mariadb.svc.cluster.local"
         - name: GALERA_SST_PASSWORD
           valueFrom:
             secretKeyRef:
               name: mariadb-secret
               key: galera-sst-password
+        - name: GALERA_CLUSTER_ADDRESS
+          value: |
+            gcomm://$(FIRST_POD)
+        - name: FIRST_POD
+          value: mariadb-0.mariadb-headless.mariadb.svc.cluster.local
         ports:
         - name: mysql
           containerPort: 3306
