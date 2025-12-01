@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb-headless
+  namespace: mariadb
+spec:
+  clusterIP: None
+  selector:
+    app: mariadb
+  ports:
+    - name: mysql
+      port: 3306
+    - name: galera
+      port: 4567
+    - name: ist
+      port: 4568
+    - name: sst
+      port: 4444
